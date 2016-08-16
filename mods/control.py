@@ -30,12 +30,10 @@ def response(text_file, keyword_flag, request_flag, directory):	#function to res
 		keyword = result[i][0]
 		if keyword in request:
 			options.append(keyword)
-	global key_len
 	key_len = len(options)
 	word = options[keyword_flag]			#get one keyword in order to flag
 	request_statement = 'SELECT phrase, sound_path FROM requests WHERE id IN (SELECT request_id FROM requests_keywords WHERE keyword_id = (SELECT id FROM keywords WHERE phrase = \'%s\'))' % (word)
 	result = db_interface.query(request_statement, cursor)									#find out list of appropriate requests and these sounds
-	global req_len
 	req_len = len(result)
 	request = result[request_flag][0]
 	phrase_audio_file = result[request_flag][1]
@@ -47,7 +45,7 @@ def response(text_file, keyword_flag, request_flag, directory):	#function to res
 			merge_list.append(template[0])
 	out_file = directory + '/workflow/responses/' + text_file.split('/')[-1] + '_response' + '.wav'	#generate response file name
 	merged_file = recognition.merge_files(merge_list, out_file, directory)									#merge parts of response
-	return merged_file
+	return merged_file, req_len, key_len
 
 if __name__ == '__main__':
 	response('/var/lib/asterisk/sounds/sip_response/workflow/text/request_977564821', 0, 0, '/var/lib/asterisk/sounds/sip_response')
