@@ -50,8 +50,8 @@ if status == 'request':
 	agi.verbose('converted file: %s' % wav_file)
 	key_length = agi.get_variable('keyword_list_len')
 	req_len = agi.get_variable('request_list_len')
-	agi.verbose('Keywords: %s' key_length)
-	agi.verbose('Requests: %s' req_len)
+	agi.verbose('Keywords: %s' % key_length)
+	agi.verbose('Requests: %s' % req_len)
 if status == 'guess':
 	positive = ['да', 'ага', 'согласен', 'разумеется', 'верно', 'так точно', \
 				'несомненно', 'безусловно', 'истинно', 'угу', 'йес', 'действительно']
@@ -85,7 +85,7 @@ if status == 'guess':
 			if keyword_flag + 1 < keywords_len:
 				agi.set_variable('keyword_flag', keyword_flag + 1)
 			else:
-			agi.set_variable('keyword_flag', 0)
+				agi.set_variable('keyword_flag', 0)
 				guess = 'redirect'
 	agi.set_variable('guess', guess)
 
