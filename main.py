@@ -81,9 +81,18 @@ if status == 'guess':
 				agi.set_variable('keyword_flag', keyword_next)
 			else:
 				agi.set_variable('keyword_flag', 0)
-				guess = 'redirect'																			#otherwise there is no option to guess; redirect call
+				guess = 'reform'																			#otherwise there is no option to guess; reform call
+				try:
+					reform_flag = agi.get_variable('reform_flag')
+				except:
+					pass
+				else:
+					guess = 'redirect'
+
 	agi.set_variable('guess', guess)																		#tell dialplan result
 	agi.verbose ('guess %s' % guess)
+	if guess == 'reform':
+		agi.set_variable('reform_flag', 1)
 if status == 'auth':
 	pass
 if status == 'answer':
