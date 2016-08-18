@@ -81,8 +81,7 @@ if status == 'guess':
 				agi.set_variable('keyword_flag', keyword_next)
 			else:
 				agi.set_variable('keyword_flag', 0)															#otherwise there is no option to guess; reform call
-				reform_flag = agi.get_variable('reform_flag')
-				agi.verbose(reform_flag)
+				reform_flag = int(agi.get_variable('reform_flag'))
 				if reform_flag == 0:	guess = 'reform'
 				else:					guess = 'redirect'
 
