@@ -80,14 +80,10 @@ if status == 'guess':
 			if keyword_next < keyword_len:																	#flip keyword flag if we have more keywords
 				agi.set_variable('keyword_flag', keyword_next)
 			else:
-				agi.set_variable('keyword_flag', 0)
-				guess = 'reform'																			#otherwise there is no option to guess; reform call
-				try:
-					reform_flag = agi.get_variable('reform_flag')
-				except:
-					pass
-				else:
-					guess = 'redirect'
+				agi.set_variable('keyword_flag', 0)															#otherwise there is no option to guess; reform call
+				reform_flag = agi.get_variable('reform_flag')
+				if reform_flag == 0:	guess = 'reform'
+				else:					guess = 'redirect'
 
 	agi.set_variable('guess', guess)																		#tell dialplan result
 	agi.verbose ('guess %s' % guess)
