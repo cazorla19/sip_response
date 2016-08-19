@@ -23,7 +23,7 @@ def speech_to_text(myfile, directory, key):
 	import speech_recognition as sr
 
 	r = sr.Recognizer()						#create new object
-	r.energy_threshold = 2000				#set big energy threshold
+	r.energy_threshold = 1000				#set big energy threshold
 	r.pause_threshold = 2					#set appropriate pause threshold
 
 	with sr.AudioFile(myfile) as source:

@@ -82,7 +82,7 @@ if status == 'guess':
 			else:
 				agi.set_variable('keyword_flag', 0)															#otherwise there is no option to guess; reform call
 				reform_flag = int(agi.get_variable('reform_flag'))
-				if reform_flag == 0:	guess = 'reform'
+				if reform_flag == 0:	guess = 'reform'													#give the user one more attempt to send request before redirect
 				else:					guess = 'redirect'
 
 	agi.set_variable('guess', guess)																		#tell dialplan result
