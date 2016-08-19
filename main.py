@@ -38,9 +38,10 @@ if status == 'request':
 	request_subdir = 'workflow/requests'
 	request_file = request_dir + '/' + request_subdir + '/' + request_file_key + '.' + request_extension	#build full file name
 	request_file = check_extension(request_file, request_extension)
-	if keyword_flag > 0 or request_flag > 0:
-		text_request = agi.get_variable('response_text')
-		agi.verbose('IT WORKS!')
+	if keyword_flag > 0 or request_flag > 0:																
+		#if it's not first iteration - get the processed text file
+		#cause we don't need to recognize the same request we did before
+		text_request = agi.get_variable('response_text')									
 	else:
 		text_request = recognition.speech_to_text(request_file, request_dir, request_file_key)					#convert request to text
 	audio_response, request_list_len, keyword_list_len = control.response(text_request, keyword_flag, request_flag, request_dir)			#get possible request
@@ -73,11 +74,9 @@ if status == 'guess':
 	request_file = request_dir + '/' + request_subdir + '/' + request_file_key + '.' + request_extension	#build full file name
 	request_file = check_extension(request_file, request_extension)											#convert if it's not wav
 	request_text_file = recognition.speech_to_text(request_file, request_dir, request_file_key, flag='guess')				#convert request to text
-	response_text_file = re.sub('_guess$', '', request_text_file)
-	agi.set_variable('response_text', response_text_file)
-	agi.verbose('response_guess_file: %s' % request_text_file)
-	agi.verbose('response_text_file: %s' % response_text_file)
-	for line in open(request_text_file, 'r'):	#get request text
+	response_text_file = re.sub('_guess$', '', request_text_file)											#remove guess suffix to determine original request path
+	agi.set_variable('response_text', response_text_file)													#set request path in case of next request iteration
+	for line in open(request_text_file, 'r'):																#get request text
 		request = line
 	request = request.decode('utf-8').lower()																#decode Russian cyrrilic
 	guess = None																							#start to guess was response true or not

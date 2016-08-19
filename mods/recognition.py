@@ -36,18 +36,18 @@ def speech_to_text(myfile, directory, key, flag=None):
 			elif engine == 'wit.ai':		text = r.recognize_wit(audio, key='EZWIEEGQQT5CELKOZS7HT3L6LEY6NJXK')
 			elif engine == 'microsoft':		text = r.recognize_bing(audio, key='338eb14c85b54534b8e66bd51ecc0ef8', language='ru-RU')
 			elif engine == 'api.ai':		text = r.recognize_api(audio, client_access_token = 'd56167192e114d2f99389ecaa97c4164', language='ru')
-			if text:									#close the loop if we've got a text
+			if text:											#close the loop if we've got a text
 				break
-		except sr.UnknownValueError, sr.RequestError:	#if any engine was broken - go to the next
+		except sr.UnknownValueError, sr.RequestError:			#if any engine was broken - go to the next
 			continue
 
-	text_file = directory + '/workflow/text/' + key 	#generate text file name
-	if flag == 'guess':		text_file = text_file + '_guess'
+	text_file = directory + '/workflow/text/' + key 			#generate text file name
+	if flag == 'guess':		text_file = text_file + '_guess'	#if it`s guess - assign special suffix to skip original request overwrite
 	with open(text_file, 'w') as text_store:
-		text_store.write(text.encode('utf-8'))			#write result to file
-	return text_file									#return path to file
+		text_store.write(text.encode('utf-8'))					#write result to file
+	return text_file											#return path to file
 
-def merge_files(merge_list, out_file, directory):					#merge some audio files into one
+def merge_files(merge_list, out_file, directory):				#merge some audio files into one
 	from pydub import AudioSegment
 	
 	full_path_list = []
