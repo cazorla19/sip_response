@@ -39,14 +39,34 @@ if status == 'request':
 	request_file = check_extension(request_file, request_extension)
 	text_request = recognition.speech_to_text(request_file, request_dir, request_file_key)					#convert request to text
 	audio_response, request_list_len, keyword_list_len = control.response(text_request, keyword_flag, request_flag, request_dir)								#get possible request
+<<<<<<< HEAD
 	agi.set_variable('request_list_len', request_list_len)
+=======
+	if not audio_response:														#if no one keyword found in user request
+		if reform_flag == 0:
+			response = 'reform'													#give the user one more attempt to send request before redirect
+			agi.set_variable('reform_flag', 1)
+		else:
+			response = 'redirect'												#if attempte was used - redirect to call-center
+		agi.set_variable('response', response)
+		agi.verbose('response: %s' % response)
+		sys.exit(0)
+	agi.set_variable('request_list_len', request_list_len)						#set length of keywords and requests globally
+>>>>>>> 7350734... empty keywords list case is done
 	agi.set_variable('keyword_list_len', keyword_list_len)
 	agi.verbose('request_list_len: %s' % request_list_len)
 	agi.verbose('keyword_list_len: %s' % keyword_list_len)
 	wav_file = audio_response
-	audio_response = recognition.converter(audio_response, 'wav', 'gsm')
+	audio_response = recognition.converter(audio_response, 'wav', 'gsm')		#convert response to GSM format for Asterisk playback
 	agi.verbose('audio_response %s' % audio_response)
+<<<<<<< HEAD
 	os.remove(wav_file)
+=======
+	os.remove(wav_file)															#remove useless wav file
+	response = 'ok'
+	agi.set_variable('response', response)										#set response is OK
+	agi.verbose('response: %s' % response)
+>>>>>>> 7350734... empty keywords list case is done
 if status == 'guess':
 	positive = ['да', 'ага', 'согласен', 'разумеется', 'верно', 'так точно', \
 				'несомненно', 'безусловно', 'истинно', 'угу', 'йес', 'действительно']
