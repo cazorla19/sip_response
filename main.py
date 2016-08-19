@@ -8,6 +8,7 @@ Responsible for dialplan data exchange and submodules call.
 
 import sys
 import os
+import re
 from mods import recognition, control	#import submodules
 from asterisk.agi import *				#pyst2
 
@@ -37,8 +38,12 @@ if status == 'request':
 	request_subdir = 'workflow/requests'
 	request_file = request_dir + '/' + request_subdir + '/' + request_file_key + '.' + request_extension	#build full file name
 	request_file = check_extension(request_file, request_extension)
-	text_request = recognition.speech_to_text(request_file, request_dir, request_file_key)					#convert request to text
-	audio_response, request_list_len, keyword_list_len = control.response(text_request, keyword_flag, request_flag, request_dir)								#get possible request
+	if keyword_flag > 0 or request_flag > 0:
+		text_request = agi.get_variable('response_text')
+		agi.verbose('IT WORKS!')
+	else:
+		text_request = recognition.speech_to_text(request_file, request_dir, request_file_key)					#convert request to text
+	audio_response, request_list_len, keyword_list_len = control.response(text_request, keyword_flag, request_flag, request_dir)			#get possible request
 	if not audio_response:														#if no one keyword found in user request
 		if reform_flag == 0:
 			response = 'reform'													#give the user one more attempt to send request before redirect
@@ -67,7 +72,11 @@ if status == 'guess':
 	request_subdir = 'workflow/guesses'
 	request_file = request_dir + '/' + request_subdir + '/' + request_file_key + '.' + request_extension	#build full file name
 	request_file = check_extension(request_file, request_extension)											#convert if it's not wav
-	request_text_file = recognition.speech_to_text(request_file, request_dir, request_file_key)				#convert request to text
+	request_text_file = recognition.speech_to_text(request_file, request_dir, request_file_key, flag='guess')				#convert request to text
+	response_text_file = re.sub('_guess$', '', request_text_file)
+	agi.set_variable('response_text', response_text_file)
+	agi.verbose('response_guess_file: %s' % response_guess_file)
+	agi.verbose('response_text_file: %s' % response_text_file)
 	for line in open(request_text_file, 'r'):	#get request text
 		request = line
 	request = request.decode('utf-8').lower()																#decode Russian cyrrilic

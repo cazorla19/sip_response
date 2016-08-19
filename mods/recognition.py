@@ -19,7 +19,7 @@ def converter(con_file, in_extension, out_extension):
 		output_segment = input_segment.export(output_file, format=out_extension)	#convert BLOB object to wav file
 	return output_file
 
-def speech_to_text(myfile, directory, key):
+def speech_to_text(myfile, directory, key, flag=None):
 	import speech_recognition as sr
 
 	r = sr.Recognizer()						#create new object
@@ -31,7 +31,7 @@ def speech_to_text(myfile, directory, key):
 
 	engines = ['google', 'wit.ai', 'microsoft', 'api.ai']		#set list of supported engines
 	for engine in engines:
-		try:		#Google in priority but they have a 50 API calls limit
+		try:		#Google in priority but they have 50 API calls limit
 			if engine == 'google':			text = r.recognize_google(audio, key='AIzaSyD__ovqKNa7PSf0Xabf0CPtBbbWeckD_EI', language='ru-RU')
 			elif engine == 'wit.ai':		text = r.recognize_wit(audio, key='EZWIEEGQQT5CELKOZS7HT3L6LEY6NJXK')
 			elif engine == 'microsoft':		text = r.recognize_bing(audio, key='338eb14c85b54534b8e66bd51ecc0ef8', language='ru-RU')
@@ -42,6 +42,7 @@ def speech_to_text(myfile, directory, key):
 			continue
 
 	text_file = directory + '/workflow/text/' + key 	#generate text file name
+	if flag == 'guess':		text_file = text_file + '_guess'
 	with open(text_file, 'w') as text_store:
 		text_store.write(text.encode('utf-8'))			#write result to file
 	return text_file									#return path to file
