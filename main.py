@@ -75,7 +75,7 @@ if status == 'guess':
 	request_text_file = recognition.speech_to_text(request_file, request_dir, request_file_key, flag='guess')				#convert request to text
 	response_text_file = re.sub('_guess$', '', request_text_file)
 	agi.set_variable('response_text', response_text_file)
-	agi.verbose('response_guess_file: %s' % response_guess_file)
+	agi.verbose('response_guess_file: %s' % request_text_file)
 	agi.verbose('response_text_file: %s' % response_text_file)
 	for line in open(request_text_file, 'r'):	#get request text
 		request = line
