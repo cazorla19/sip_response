@@ -41,8 +41,11 @@ if status == 'request':
 	text_request = recognition.speech_to_text(request_file, request_dir, request_file_key)					#convert request to text
 	audio_response, request_list_len, keyword_list_len = control.response(text_request, keyword_flag, request_flag, request_dir)								#get possible request
 	if not audio_response:
-		if reform_flag == 0:	response = 'reform'													#give the user one more attempt to send request before redirect
-		else:					response = 'redirect'
+		if reform_flag == 0:
+			response = 'reform'													#give the user one more attempt to send request before redirect
+			agi.set_variable('reform_flag', 1)
+		else:
+			response = 'redirect'
 		agi.set_variable('response', response)
 		agi.verbose('response: %s' % response)
 		sys.exit(0)
