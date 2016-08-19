@@ -49,6 +49,6 @@ def response(text_file, keyword_flag, request_flag, directory):	#function to res
 	merged_file = recognition.merge_files(merge_list, out_file, directory)									#merge parts of response
 	return merged_file, req_len, key_len
 
-if __name__ == '__main__':																			#test the function
+if __name__ == '__main__':
 	func = response('/var/lib/asterisk/sounds/sip_response/workflow/text/request_977564821', 0, 0, '/var/lib/asterisk/sounds/sip_response')
 	print(func)

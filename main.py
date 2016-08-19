@@ -44,6 +44,7 @@ if status == 'request':
 		if reform_flag == 0:	response = 'reform'													#give the user one more attempt to send request before redirect
 		else:					response = 'redirect'
 		agi.set_variable('response', response)
+		agi.verbose('response: %s' % response)
 		sys.exit(0)
 	agi.set_variable('request_list_len', request_list_len)
 	agi.set_variable('keyword_list_len', keyword_list_len)
@@ -53,6 +54,9 @@ if status == 'request':
 	audio_response = recognition.converter(audio_response, 'wav', 'gsm')
 	agi.verbose('audio_response %s' % audio_response)
 	os.remove(wav_file)
+	response = 'ok'
+	agi.set_variable('response', response)
+	agi.verbose('response: %s' % response)
 if status == 'guess':
 	positive = ['да', 'ага', 'согласен', 'разумеется', 'верно', 'так точно', \
 				'несомненно', 'безусловно', 'истинно', 'угу', 'йес', 'действительно']
@@ -74,7 +78,7 @@ if status == 'guess':
 			if word in request:																				#if we found positive word - response was true
 				guess = 'yes'
 	if not guess:	guess = 'unrecognized'
-	if guess == 'no':																						#flip flags for the next iteration
+	if guess == 'no':
 		keyword_len = int(agi.get_variable('keyword_list_len'))
 		request_len = int(agi.get_variable('request_list_len'))
 		keyword_next = keyword_flag + 1
