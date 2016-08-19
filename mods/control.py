@@ -31,6 +31,8 @@ def response(text_file, keyword_flag, request_flag, directory):	#function to res
 		if keyword in request:
 			options.append(keyword)
 	key_len = len(options)
+	if key_len == 0:
+		return 0, 0, 0
 	word = options[keyword_flag]			#get one keyword in order to flag
 	request_statement = 'SELECT phrase, sound_path FROM requests WHERE id IN (SELECT request_id FROM requests_keywords WHERE keyword_id = (SELECT id FROM keywords WHERE phrase = \'%s\'))' % (word)
 	result = db_interface.query(request_statement, cursor)									#find out list of appropriate requests and these sounds

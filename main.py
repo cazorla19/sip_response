@@ -26,6 +26,7 @@ agi.verbose("call from %s" % callerId)
 #in case of repetitive request guess operation
 keyword_flag = int(agi.get_variable('keyword_flag'))						#set keyword number
 request_flag = int(agi.get_variable('request_flag'))						#set request number
+reform_flag = int(agi.get_variable('reform_flag'))							#set the reform trigger
 status = agi.get_variable('module_call')									#get status from asterisk
 request_file_key = agi.get_variable('request_id')							#get file name
 request_extension = agi.get_variable('file_extension')						#get file extension
@@ -39,6 +40,11 @@ if status == 'request':
 	request_file = check_extension(request_file, request_extension)
 	text_request = recognition.speech_to_text(request_file, request_dir, request_file_key)					#convert request to text
 	audio_response, request_list_len, keyword_list_len = control.response(text_request, keyword_flag, request_flag, request_dir)								#get possible request
+	if not audio_response:
+		if reform_flag == 0:	response = 'reform'													#give the user one more attempt to send request before redirect
+		else:					response = 'redirect'
+		agi.set_variable('response', response)
+		sys.exit(0)
 	agi.set_variable('request_list_len', request_list_len)
 	agi.set_variable('keyword_list_len', keyword_list_len)
 	agi.verbose('request_list_len: %s' % request_list_len)
@@ -81,7 +87,6 @@ if status == 'guess':
 				agi.set_variable('keyword_flag', keyword_next)
 			else:
 				agi.set_variable('keyword_flag', 0)															#otherwise there is no option to guess; reform call
-				reform_flag = int(agi.get_variable('reform_flag'))
 				if reform_flag == 0:	guess = 'reform'													#give the user one more attempt to send request before redirect
 				else:					guess = 'redirect'
 
