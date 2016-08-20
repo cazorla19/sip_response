@@ -41,10 +41,14 @@ if status == 'request':
 	if keyword_flag > 0 or request_flag > 0:																
 		#if it's not first iteration - get the processed text file
 		#cause we don't need to recognize the same request we did before
-		text_request = agi.get_variable('response_text')									
+		text_request = agi.get_variable('response_text')
+		keyword_scan = False									
 	else:
 		text_request = recognition.speech_to_text(request_file, request_dir, request_file_key)					#convert request to text
-	audio_response, request_list_len, keyword_list_len = control.response(text_request, keyword_flag, request_flag, request_dir)			#get possible request
+		keyword_scan = True
+	audio_response, request_list_len, keyword_list_len = control.response(text_request, keyword_flag, request_flag, request_dir, keyword_scan)			#get possible request
+	if not keyword_scan:
+		agi.verbose('Shelve works!')
 	if not audio_response:														#if no one keyword found in user request
 		if reform_flag == 0:
 			response = 'reform'													#give the user one more attempt to send request before redirect

@@ -8,6 +8,7 @@ Submodule for requests processing
 import db_interface			#for DB connections
 import recognition
 import sys
+import shelve
 from asterisk.agi import *
 
 """
@@ -18,18 +19,26 @@ Set length of requests results and pass to AGI
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-def response(text_file, keyword_flag, request_flag, directory):	#function to response initial user request
+def response(text_file, keyword_flag, request_flag, directory, keyword_scan):	#function to response initial user request
 	for line in open(text_file, 'r'):	#get request text
 		request = line
 	request = request.decode('utf-8').lower()
-	statement = 'SELECT phrase FROM keywords'
+	request_id = text_file.split('/')[-1]
+	shelve_file = directory + '/workflow/shelves/' + request_id
 	cursor = db_interface.connect(db='sip_response', user='cazorla19', password='123456')
-	result = db_interface.query(statement, cursor)											#make query to look for a possible keywords
-	options = []
-	for i in range(len(result)):
-		keyword = result[i][0]
-		if keyword in request:
-			options.append(keyword)
+	if keyword_scan:
+		keyword_file = shelve.open(shelve_file)
+		statement = 'SELECT phrase FROM keywords'
+		result = db_interface.query(statement, cursor)											#make query to look for a possible keywords
+		options = []
+		for i in range(len(result)):
+			keyword = result[i][0]
+			if keyword in request:
+				options.append(keyword)
+		keyword_file['keyword_list'] = options
+	else:
+		keyword_file = shelve.open(shelve_file)
+		options = keyword_file['keyword_list']
 	key_len = len(options)
 	if key_len == 0:																		#if no one keyword found - return empty values
 		return 0, 0, 0
@@ -45,7 +54,7 @@ def response(text_file, keyword_flag, request_flag, directory):	#function to res
 	if len(templates) > 1:
 		for template in templates[1:]:
 			merge_list.append(template[0])
-	out_file = directory + '/workflow/responses/' + text_file.split('/')[-1] + '_response' + '.wav'	#generate response file name
+	out_file = directory + '/workflow/responses/' + request_id + '_response' + '.wav'	#generate response file name
 	merged_file = recognition.merge_files(merge_list, out_file, directory)									#merge parts of response
 	return merged_file, req_len, key_len
 
