@@ -58,6 +58,35 @@ def response(text_file, keyword_flag, request_flag, directory, keyword_scan):	#f
 	merged_file = recognition.merge_files(merge_list, out_file, directory)									#merge parts of response
 	return merged_file, req_len, key_len
 
+def auth_name(text_file):
+	for line in open(text_file, 'r'):	#get request text
+		request = line
+	surname, name, middle_name, year = request.split()[0:4]
+	cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
+	statement = 'SELECT id, CONCAT(surname, \' \', name, \' \', middle_name, \' \', year) FROM customers WHERE surname = \'%s\' AND name = \'%s\' AND middle_name = \'%s\' AND year = \'%s\';' % (surname, name, middle_name, year)
+	result = db_interface.query(statement, cursor)
+	if len(result) > 1:
+		status = 'redirect'
+		return status, 0
+	elif len(result) == 0:
+		status = 'failed'
+		return status, 0
+	else:
+		status = 'success'
+		customer_id = result[0][0]
+		return status, customer_id
+
+def auth_credentials(field, text_file, customer_id):
+	for line in open(text_file, 'r'):	#get request text
+		request = line
+	cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
+	statement = 'SELECT %s FROM auth WHERE customer_id = %d;' %(field, customer_id)
+	result = db_interface.query(statement, cursor)
+	credential = result[0][0]
+	if str(credential) in request:	status = 'success'
+	else:							status = 'failed'
+	return status
+
 if __name__ == '__main__':																			#test the function
 	func = response('/var/lib/asterisk/sounds/sip_response/workflow/text/request_977564821', 0, 0, '/var/lib/asterisk/sounds/sip_response')
 	print(func)

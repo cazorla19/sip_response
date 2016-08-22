@@ -3,7 +3,7 @@ CREATE TABLE customers (
 	name VARCHAR(30) NOT NULL,
 	middle_name VARCHAR(30),
 	surname VARCHAR(30) NOT NULL,
-	age INT NOT NULL,
+	year INT NOT NULL,
 	CONSTRAINT customers_id_idx UNIQUE(id)
 );
 

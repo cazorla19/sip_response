@@ -33,6 +33,7 @@ request_extension = agi.get_variable('file_extension')						#get file extension
 agi.verbose(status)
 agi.verbose('request_flag: %s' % request_flag)
 agi.verbose('keyword_flag: %s' % keyword_flag)
+### TESTING!
 request_dir = '/var/lib/asterisk/sounds/sip_response'
 if status == 'request':
 	request_subdir = 'workflow/requests'
@@ -47,8 +48,6 @@ if status == 'request':
 		text_request = recognition.speech_to_text(request_file, request_dir, request_file_key)					#convert request to text
 		keyword_scan = True
 	audio_response, request_list_len, keyword_list_len = control.response(text_request, keyword_flag, request_flag, request_dir, keyword_scan)			#get possible request
-	if not keyword_scan:
-		agi.verbose('Shelve works!')
 	if not audio_response:														#if no one keyword found in user request
 		if reform_flag == 0:
 			response = 'reform'													#give the user one more attempt to send request before redirect
@@ -114,6 +113,24 @@ if status == 'guess':
 	if guess == 'reform':
 		agi.set_variable('reform_flag', 1)
 if status == 'auth':
-	pass
+	field = agi.get_variable('auth_subrequest')
+	agi.verbose('auth_subrequest %s' % field)
+	request_subdir = 'workflow/auth'
+	request_file = request_dir + '/' + request_subdir + '/' + request_file_key + '.' + request_extension					#build full file name
+	request_file = check_extension(request_file, request_extension)															#convert if it's not wav
+	request_text_file = recognition.speech_to_text(request_file, request_dir, request_file_key, flag='auth')				#convert request to text
+	agi.verbose('request_text_file %s' % request_text_file)
+	if field == 'name':
+		auth_result, customer_id = control.auth_name(request_text_file)
+		agi.set_variable('customer_id', customer_id)
+		agi.verbose('customer_id %s' % customer_id)
+	else:
+		customer_id = int(agi.get_variable('customer_id'))
+		auth_result = control.auth_credentials(field, request_text_file, customer_id)
+	auth_failed_flag = int(agi.get_variable('auth_failed_flag'))
+	if status == 'success':			agi.set_variable('auth_failed_flag', 0)
+	elif auth_failed_flag == 1:		status = 'redirect'
+	else:							agi.set_variable('auth_failed_flag', 1)
+	agi.set_variable('auth_result', auth_result)	
 if status == 'answer':
 	pass

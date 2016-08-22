@@ -42,7 +42,7 @@ def speech_to_text(myfile, directory, key, flag=None):
 			continue
 
 	text_file = directory + '/workflow/text/' + key 			#generate text file name
-	if flag == 'guess':		text_file = text_file + '_guess'	#if it`s guess - assign special suffix to skip original request overwrite
+	if flag:		text_file = text_file + '_' + flag			#if it`s guess - assign special suffix to skip original request overwrite
 	with open(text_file, 'w') as text_store:
 		text_store.write(text.encode('utf-8'))					#write result to file
 	return text_file											#return path to file

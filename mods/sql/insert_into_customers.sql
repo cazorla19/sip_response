@@ -1,4 +1,4 @@
-INSERT INTO customers (name, middle_name, surname, age) VALUES ('Петр', 'Иванович', 'Сидоров', 29);
+INSERT INTO customers (name, middle_name, surname, year) VALUES ('Петр', 'Иванович', 'Сидоров', 1980);
 
 INSERT INTO transactions (customer_id,partner,operation,amount) VALUES (1, 'Мегафон', 'cash_out', 100);
 
