@@ -27,6 +27,7 @@ agi.verbose("call from %s" % callerId)
 #in case of repetitive request guess operation
 keyword_flag = int(agi.get_variable('keyword_flag'))						#set keyword number
 request_flag = int(agi.get_variable('request_flag'))						#set request number
+reform_flag = int(agi.get_variable('reform_flag'))							#set the reform trigger
 status = agi.get_variable('module_call')									#get status from asterisk
 request_file_key = agi.get_variable('request_id')							#get file name
 request_extension = agi.get_variable('file_extension')						#get file extension
@@ -91,7 +92,7 @@ if status == 'guess':
 			if word in request:																				#if we found positive word - response was true
 				guess = 'yes'
 	if not guess:	guess = 'unrecognized'
-	if guess == 'no':																						#flip flags for the next iteration
+	if guess == 'no':
 		keyword_len = int(agi.get_variable('keyword_list_len'))
 		request_len = int(agi.get_variable('request_list_len'))
 		keyword_next = keyword_flag + 1
@@ -104,7 +105,6 @@ if status == 'guess':
 				agi.set_variable('keyword_flag', keyword_next)
 			else:
 				agi.set_variable('keyword_flag', 0)															#otherwise there is no option to guess; reform call
-				reform_flag = int(agi.get_variable('reform_flag'))
 				if reform_flag == 0:	guess = 'reform'													#give the user one more attempt to send request before redirect
 				else:					guess = 'redirect'
 

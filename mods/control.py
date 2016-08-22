@@ -88,5 +88,5 @@ def auth_credentials(field, text_file, customer_id):
 	return status
 
 if __name__ == '__main__':																			#test the function
-	func = response('/var/lib/asterisk/sounds/sip_response/workflow/text/request_977564821', 0, 0, '/var/lib/asterisk/sounds/sip_response')
+	func = response('/var/lib/asterisk/sounds/sip_response/workflow/text/request_977564821', 0, 0, '/var/lib/asterisk/sounds/sip_response', 1)
 	print(func)
