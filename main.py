@@ -60,7 +60,7 @@ if status == 'request':
 		sys.exit(0)
 	agi.set_variable('request_list_len', request_list_len)						#set length of keywords and requests globally
 	agi.set_variable('keyword_list_len', keyword_list_len)
-	agi.set_variable('user_request_id', user_request_id)
+	agi.set_variable('user_request_id', user_request_id)						#request id will be used in answer
 	agi.verbose('request_list_len: %s' % request_list_len)
 	agi.verbose('keyword_list_len: %s' % keyword_list_len)
 	agi.verbose('user_request_id: %s' % user_request_id)
