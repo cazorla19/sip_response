@@ -123,14 +123,14 @@ if status == 'auth':
 	if field == 'name':
 		auth_result, customer_id = control.auth_name(request_text_file)
 		agi.set_variable('customer_id', customer_id)
-		agi.verbose('customer_id %s' % customer_id)
+		agi.verbose('customer_id: %s' % customer_id)
 	else:
 		customer_id = int(agi.get_variable('customer_id'))
 		auth_result = control.auth_credentials(field, request_text_file, customer_id)
 	auth_failed_flag = int(agi.get_variable('auth_failed_flag'))
-	if status == 'success':									agi.set_variable('auth_failed_flag', 0)
-	elif status == 'failed' and auth_failed_flag == 0:		agi.set_variable('auth_failed_flag', 1)
-	elif status == 'failed' and auth_failed_flag == 1:		status = 'redirect'
+	if auth_result == 'success':								agi.set_variable('auth_failed_flag', 0)
+	elif auth_result == 'failed' and auth_failed_flag == 0:		agi.set_variable('auth_failed_flag', 1)
+	elif auth_result == 'failed' and auth_failed_flag == 1:		status = 'redirect'
 	auth_failed_flag = agi.get_variable('auth_failed_flag')
 	agi.verbose('auth_failed_flag: %s' % auth_failed_flag)
 	agi.set_variable('auth_result', auth_result)
