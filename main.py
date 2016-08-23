@@ -130,7 +130,7 @@ if status == 'auth':
 	auth_failed_flag = int(agi.get_variable('auth_failed_flag'))
 	if auth_result == 'success':								agi.set_variable('auth_failed_flag', 0)
 	elif auth_result == 'failed' and auth_failed_flag == 0:		agi.set_variable('auth_failed_flag', 1)
-	elif auth_result == 'failed' and auth_failed_flag == 1:		status = 'redirect'
+	elif auth_result == 'failed' and auth_failed_flag == 1:		auth_result = 'redirect'
 	auth_failed_flag = agi.get_variable('auth_failed_flag')
 	agi.verbose('auth_failed_flag: %s' % auth_failed_flag)
 	agi.set_variable('auth_result', auth_result)
