@@ -34,7 +34,6 @@ request_extension = agi.get_variable('file_extension')						#get file extension
 agi.verbose(status)
 agi.verbose('request_flag: %s' % request_flag)
 agi.verbose('keyword_flag: %s' % keyword_flag)
-### TESTING!
 request_dir = '/var/lib/asterisk/sounds/sip_response'
 if status == 'request':
 	request_subdir = 'workflow/requests'
