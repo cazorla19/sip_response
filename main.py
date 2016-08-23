@@ -131,6 +131,7 @@ if status == 'auth':
 	if status == 'success':			agi.set_variable('auth_failed_flag', 0)
 	elif auth_failed_flag == 1:		status = 'redirect'
 	else:							agi.set_variable('auth_failed_flag', 1)
-	agi.set_variable('auth_result', auth_result)	
+	agi.set_variable('auth_result', auth_result)
+	agi.verbose('auth_result: %s' auth_result)	
 if status == 'answer':
 	pass
