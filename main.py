@@ -48,7 +48,7 @@ if status == 'request':
 	else:
 		text_request = recognition.speech_to_text(request_file, request_dir, request_file_key)					#convert request to text
 		keyword_scan = True
-	audio_response, request_list_len, keyword_list_len = control.response(text_request, keyword_flag, request_flag, request_dir, keyword_scan)			#get possible request
+	audio_response, request_list_len, keyword_list_len, user_request_id = control.response(text_request, keyword_flag, request_flag, request_dir, keyword_scan)			#get possible request
 	if not audio_response:														#if no one keyword found in user request
 		if reform_flag == 0:
 			response = 'reform'													#give the user one more attempt to send request before redirect
@@ -60,8 +60,10 @@ if status == 'request':
 		sys.exit(0)
 	agi.set_variable('request_list_len', request_list_len)						#set length of keywords and requests globally
 	agi.set_variable('keyword_list_len', keyword_list_len)
+	agi.set_variable('user_request_id', user_request_id)
 	agi.verbose('request_list_len: %s' % request_list_len)
 	agi.verbose('keyword_list_len: %s' % keyword_list_len)
+	agi.verbose('user_request_id: %s' % user_request_id)
 	wav_file = audio_response
 	audio_response = recognition.converter(audio_response, 'wav', 'gsm')		#convert response to GSM format for Asterisk playback
 	agi.verbose('audio_response %s' % audio_response)
@@ -112,28 +114,27 @@ if status == 'guess':
 	agi.verbose ('guess %s' % guess)
 	if guess == 'reform':
 		agi.set_variable('reform_flag', 1)
-if status == 'auth':
-	field = agi.get_variable('auth_subrequest')
+if status == 'auth':																						#verify user identity
+	field = agi.get_variable('auth_subrequest')																#get request field (name/cvv-code/credit card numbers/card code)
 	agi.verbose('auth_subrequest %s' % field)
 	request_subdir = 'workflow/auth'
 	request_file = request_dir + '/' + request_subdir + '/' + request_file_key + '.' + request_extension					#build full file name
 	request_file = check_extension(request_file, request_extension)															#convert if it's not wav
 	request_text_file = recognition.speech_to_text(request_file, request_dir, request_file_key, flag='auth')				#convert request to text
 	agi.verbose('request_text_file %s' % request_text_file)
-	if field == 'name':
+	if field == 'name':																						#call control module function depending on the subrequest
 		auth_result, customer_id = control.auth_name(request_text_file)
-		agi.set_variable('customer_id', customer_id)
+		agi.set_variable('customer_id', customer_id)														#get customer id after name authentication
 		agi.verbose('customer_id: %s' % customer_id)
 	else:
 		customer_id = int(agi.get_variable('customer_id'))
 		auth_result = control.auth_credentials(field, request_text_file, customer_id)
-	auth_failed_flag = int(agi.get_variable('auth_failed_flag'))
-	if auth_result == 'success':								agi.set_variable('auth_failed_flag', 0)
-	elif auth_result == 'failed' and auth_failed_flag == 0:		agi.set_variable('auth_failed_flag', 1)
-	elif auth_result == 'failed' and auth_failed_flag == 1:		auth_result = 'redirect'
-	auth_failed_flag = agi.get_variable('auth_failed_flag')
-	agi.verbose('auth_failed_flag: %s' % auth_failed_flag)
-	agi.set_variable('auth_result', auth_result)
+	auth_failed_flag = int(agi.get_variable('auth_failed_flag'))											#failed flag records the fact of repetitive authentication
+	if auth_result == 'success':								agi.set_variable('auth_failed_flag', 0)		#switch flag back if request succeeded
+	elif auth_result == 'failed' and auth_failed_flag == 0:		agi.set_variable('auth_failed_flag', 1)		#set the label one attempt is left
+	elif auth_result == 'failed' and auth_failed_flag == 1:		auth_result = 'redirect'					#redirect if all attempts are gone
+	agi.set_variable('auth_result', auth_result)															#tell dialplan what's the final result
 	agi.verbose('auth_result: %s' % auth_result)	
 if status == 'answer':
 	pass
+	## Идея! Получить id запроса, по нему запрашивать ответы из answers и SQL-команлы из statements, выводить в звук результаты команд и затем поочередно мержить файлы в единый ответ

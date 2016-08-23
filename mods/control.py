@@ -43,12 +43,14 @@ def response(text_file, keyword_flag, request_flag, directory, keyword_scan):	#f
 	if key_len == 0:																		#if no one keyword found - return empty values
 		return 0, 0, 0
 	word = options[keyword_flag]															#get one keyword in order to flag
-	request_statement = 'SELECT phrase, sound_path FROM requests WHERE id IN (SELECT request_id FROM requests_keywords WHERE keyword_id = (SELECT id FROM keywords WHERE phrase = \'%s\'))' % (word)
+	request_statement = 'SELECT id, phrase, sound_path FROM requests WHERE id IN (SELECT request_id FROM requests_keywords WHERE keyword_id = (SELECT id FROM keywords WHERE phrase = \'%s\'))' % (word)
 	result = db_interface.query(request_statement, cursor)									#find out list of appropriate requests and these sounds
 	req_len = len(result)
-	request = result[request_flag][0]
-	phrase_audio_file = result[request_flag][1]
-	templates_statement = 'SELECT sound_path FROM templates WHERE id IN (SELECT template_id FROM requests_templates WHERE request_id = (SELECT id FROM requests WHERE phrase = \'%s\'));' % (request)
+	user_request_id = result[request_flag][0]
+	request = result[request_flag][1]
+	phrase_audio_file = result[request_flag][2]
+	templates_statement = 'SELECT sound_path FROM templates WHERE id IN (SELECT template_id FROM requests_templates WHERE request_id = %d);' % (user_request_id)
+	#templates_statement = 'SELECT sound_path FROM templates WHERE id IN (SELECT template_id FROM requests_templates WHERE request_id = (SELECT id FROM requests WHERE phrase = \'%s\'));' % (request)
 	templates = db_interface.query(templates_statement, cursor)	#find out templates
 	merge_list = [templates[0][0], phrase_audio_file]			#generate list of files to merge
 	if len(templates) > 1:
@@ -56,23 +58,24 @@ def response(text_file, keyword_flag, request_flag, directory, keyword_scan):	#f
 			merge_list.append(template[0])
 	out_file = directory + '/workflow/responses/' + request_id + '_response' + '.wav'	#generate response file name
 	merged_file = recognition.merge_files(merge_list, out_file, directory)									#merge parts of response
-	return merged_file, req_len, key_len
+	return merged_file, req_len, key_len, user_request_id
 
 def auth_name(text_file):
-	for line in open(text_file, 'r'):	#get request text
+	for line in open(text_file, 'r'):														#get request text
 		request = line
-	surname, name, middle_name, year = request.split()[0:4]
+	surname, name, middle_name, year = request.split()[0:4]									#syntax requires correct names and years order
 	cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
+	#get the fact customer exists, pull his id
 	statement = 'SELECT id, CONCAT(surname, \' \', name, \' \', middle_name, \' \', year) FROM customers WHERE surname = \'%s\' AND name = \'%s\' AND middle_name = \'%s\' AND year = \'%s\';' % (surname, name, middle_name, year)
 	result = db_interface.query(statement, cursor)
-	if len(result) > 1:
+	if len(result) > 1:				#workaround; don't know what to do if many customers with the same credentials
 		status = 'redirect'
 		return status, 0
-	elif len(result) == 0:
+	elif len(result) == 0:			#failed authentication if no one customer has been found
 		status = 'failed'
 		return status, 0
 	else:
-		status = 'success'
+		status = 'success'			#set the customer id if we found one
 		customer_id = result[0][0]
 		return status, customer_id
 
@@ -80,11 +83,11 @@ def auth_credentials(field, text_file, customer_id):
 	for line in open(text_file, 'r'):	#get request text
 		request = line
 	cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
-	statement = 'SELECT %s FROM auth WHERE customer_id = %d;' %(field, customer_id)
+	statement = 'SELECT %s FROM auth WHERE customer_id = %d;' %(field, customer_id)			#field is a DB table column, customer id is a primary key
 	result = db_interface.query(statement, cursor)
-	credential = result[0][0]
-	if str(credential) in request:	status = 'success'
-	else:							status = 'failed'
+	credential = result[0][0]																#get first value as a customer credential
+	if str(credential) in request:	status = 'success'										#if we found creential in request; it's alright
+	else:							status = 'failed'										#otherwise request failed
 	return status
 
 if __name__ == '__main__':																			#test the function
