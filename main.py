@@ -136,6 +136,10 @@ if status == 'auth':																						#verify user identity
 if status == 'answer':
 	user_request_id = int(agi.get_variable('user_request_id'))
 	customer_id = int(agi.get_variable('customer_id'))
+	agi.verbose('user_request_id: %s' % user_request_id)
+	agi.verbose('customer_id: %s' % customer_id)
+	agi.verbose('call_id: %s' % request_file_key)
+	agi.verbose('request_dir: %s' % request_dir)
 	answer_file, answer_status = control.answer(user_request_id, customer_id, request_file_key, request_dir)
 	agi.verbose('answer_status: %s' % answer_status)
 	audio_response = recognition.converter(answer_file, 'wav', 'gsm')		#convert response to GSM format for Asterisk playback
