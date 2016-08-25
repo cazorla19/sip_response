@@ -20,20 +20,24 @@ def check_extension(request_file, request_extension):	#check is it wav or not
 		request_file = recognition.converter(request_file, request_extension, 'wav')	#call converter if it's not wav
 	return request_file
 
-agi = AGI()							#initialize AGI instance
-agi.verbose("python agi started")		#print some stuff to ensure we connected
-callerId = agi.env['agi_callerid']
-agi.verbose("call from %s" % callerId)
-#in case of repetitive request guess operation
-keyword_flag = int(agi.get_variable('keyword_flag'))						#set keyword number
-request_flag = int(agi.get_variable('request_flag'))						#set request number
-reform_flag = int(agi.get_variable('reform_flag'))							#set the reform trigger
-status = agi.get_variable('module_call')									#get status from asterisk
-request_file_key = agi.get_variable('request_id')							#get file name
-request_extension = agi.get_variable('file_extension')						#get file extension
-agi.verbose(status)
-agi.verbose('request_flag: %s' % request_flag)
-agi.verbose('keyword_flag: %s' % keyword_flag)
+# agi = AGI()							#initialize AGI instance
+# agi.verbose("python agi started")		#print some stuff to ensure we connected
+# callerId = agi.env['agi_callerid']
+# agi.verbose("call from %s" % callerId)
+# #in case of repetitive request guess operation
+# keyword_flag = int(agi.get_variable('keyword_flag'))						#set keyword number
+# request_flag = int(agi.get_variable('request_flag'))						#set request number
+# reform_flag = int(agi.get_variable('reform_flag'))							#set the reform trigger
+# status = agi.get_variable('module_call')									#get status from asterisk
+# request_file_key = agi.get_variable('request_id')							#get file name
+# request_extension = agi.get_variable('file_extension')						#get file extension
+# agi.verbose(status)
+# agi.verbose('request_flag: %s' % request_flag)
+# agi.verbose('keyword_flag: %s' % keyword_flag)
+keyword_flag = 0						#set keyword number
+request_flag = 0						#set request number
+status = sys.argv[1]					#get status from Asterisk
+request_extension = 'wav'
 request_dir = '/var/lib/asterisk/sounds/sip_response'
 if status == 'request':
 	request_subdir = 'workflow/requests'
@@ -66,7 +70,6 @@ if status == 'request':
 	wav_file = audio_response
 	audio_response = recognition.converter(audio_response, 'wav', 'gsm')		#convert response to GSM format for Asterisk playback
 	agi.verbose('audio_response %s' % audio_response)
-	os.remove(wav_file)															#remove useless wav file
 	response = 'ok'
 	agi.set_variable('response', response)										#set response is OK
 	agi.verbose('response: %s' % response)
@@ -135,5 +138,15 @@ if status == 'auth':																						#verify user identity
 	agi.set_variable('auth_result', auth_result)															#tell dialplan what's the final result
 	agi.verbose('auth_result: %s' % auth_result)	
 if status == 'answer':
-	pass
-	## Идея! Получить id запроса, по нему запрашивать ответы из answers и SQL-команлы из statements, выводить в звук результаты команд и затем поочередно мержить файлы в единый ответ
+	# user_request_id = int(agi.get_variable('user_request_id'))
+	# customer_id = int(agi.get_variable('customer_id'))
+	user_request_id = 1
+	customer_id = 1
+	request_id = 5858585858
+	answer_file, answer_status = control.answer(user_request_id, customer_id, request_id, request_dir)
+	#TO DO! Convert answer file to GSM
+	print(answer_status)
+	wav_file = answer_file
+	audio_response = recognition.converter(wav_file, 'wav', 'gsm')		#convert response to GSM format for Asterisk playback
+	# agi.verbose('audio_response %s' % audio_response)
+	# agi.set_variable('answer', answer_status)

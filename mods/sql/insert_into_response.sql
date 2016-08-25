@@ -8,10 +8,10 @@ INSERT INTO templates(phrase,sound_path) VALUES ('Ваш запрос', 'sounds/
 
 INSERT INTO statements(statement) VALUES('SELECT account_id FROM customers_accounts WHERE customer_id = ''VAR'''), ('SELECT balance FROM customers_accounts WHERE customer_id = ''VAR''');
 
-INSERT INTO requests_keywords VALUES(1, 1, 1), (1, 2, 2), (1, 3, 3), (1, 4, 4);
+INSERT INTO requests_keywords VALUES(1, 1, 0), (1, 2, 1), (1, 3, 2), (1, 4, 3);
 
-INSERT INTO requests_answers VALUES(1, 1, 1), (1, 2, 2);
+INSERT INTO requests_answers VALUES(1, 1, 0), (1, 2, 1);
 
-INSERT INTO requests_templates VALUES(1, 5, 1), (1, 6, 2);
+INSERT INTO requests_templates VALUES(1, 5, 0), (1, 6, 1);
 
-INSERT INTO requests_statements VALUES(1, 1, 1), (1, 2, 2);
+INSERT INTO requests_statements VALUES(1, 1, 0), (1, 2, 1);

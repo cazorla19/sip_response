@@ -9,6 +9,7 @@ import db_interface			#for DB connections
 import recognition
 import sys
 import shelve
+import os
 from asterisk.agi import *
 
 """
@@ -89,6 +90,53 @@ def auth_credentials(field, text_file, customer_id):
 	if str(credential) in request:	status = 'success'										#if we found creential in request; it's alright
 	else:							status = 'failed'										#otherwise request failed
 	return status
+
+def answer(user_request_id, customer_id, call_id, directory):
+
+	def get_values(cursor, table, column, user_request_id):
+		statement = 'SELECT %s_id FROM requests_%ss WHERE request_id = %d ORDER BY seq_order;' %(table, table, user_request_id)
+		result = db_interface.query(statement, cursor)
+		custom_list = []
+		for custom_tuple in result:
+			custom_list.append(custom_tuple[0])
+		custom_tuple = tuple(custom_list)
+		final_statement = 'SELECT %s FROM %ss WHERE id IN %s ORDER BY idx(array%s, id)' % (column, table, custom_tuple, custom_list)
+		final_statement_result = db_interface.query(final_statement, cursor)
+		return final_statement_result
+
+	cursor = db_interface.connect(db='sip_response', user='cazorla19', password='123456')
+	sql_statements_result = get_values(cursor, 'statement', 'statement', user_request_id)
+	answers_result = get_values(cursor, 'answer', 'sound_path', user_request_id)
+
+	customers_cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
+	init_audio_format = 'mp3'
+	prepared_statements = []
+	for i in range(len(sql_statements_result)):
+		command = sql_statements_result[i][0].replace('\'VAR\'', str(customer_id))
+		command_result = db_interface.query(command, customers_cursor)
+		value = str(command_result[0][0])
+		audio_file = directory + '/workflow/answers_tmp/' + str(call_id) + '[' + str(i) + '].' + init_audio_format
+		audio_file = recognition.text_to_speech(value, 'ru', audio_file)
+		audio_file_wav = recognition.converter(audio_file, init_audio_format, 'wav')
+		audio_file_rel_path = 'workflow/answers_tmp/' + str(call_id) + '[' + str(i) + '].wav'
+		prepared_statements.append(audio_file_rel_path)
+	merge_list = []
+	for j in range(len(answers_result)):
+		try:
+			answer_file = answers_result[j][0]
+			merge_list.append(answer_file)
+			merge_list.append(prepared_statements[j])
+		except IndexError:
+			pass
+	out_file = directory + '/workflow/answers/' + str(call_id) + '_answer' + '.wav'
+	merged_file = recognition.merge_files(merge_list, out_file, directory)									#merge parts of response
+	if os.path.exists(merged_file):
+		status = 'success'
+		return merged_file, status
+	else:
+		status = 'failed'
+		return None, status
+
 
 if __name__ == '__main__':																			#test the function
 	func = response('/var/lib/asterisk/sounds/sip_response/workflow/text/request_977564821', 0, 0, '/var/lib/asterisk/sounds/sip_response', 1)

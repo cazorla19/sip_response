@@ -7,6 +7,7 @@ Submodule for audiofile conversion and speech recognition
 
 
 def converter(con_file, in_extension, out_extension):
+	import os
 	input_file_key = con_file.split('.')[0]			#get file name with no extension
 	output_file = input_file_key + '.' + out_extension			#generate new file name
 
@@ -17,6 +18,7 @@ def converter(con_file, in_extension, out_extension):
 		from pydub import AudioSegment
 		input_segment = AudioSegment.from_file(con_file, in_extension)			#create new special BLOB object
 		output_segment = input_segment.export(output_file, format=out_extension)	#convert BLOB object to wav file
+	os.remove(con_file)
 	return output_file
 
 def speech_to_text(myfile, directory, key, flag=None):
@@ -62,4 +64,10 @@ def merge_files(merge_list, out_file, directory):				#merge some audio files int
 		out_sound += sound
 
 	out_sound.export(out_file, format='wav')			#export sound we've got
+	return out_file
+
+def text_to_speech(text, language, out_file):
+	from gtts import gTTS
+	tts = gTTS(text=text, lang=language)
+	tts.save(out_file)
 	return out_file
