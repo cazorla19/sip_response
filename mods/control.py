@@ -145,5 +145,5 @@ def record_log(call_agi_id, call_number, customer_id, request_id, call_status, a
 	print(logging)
 
 if __name__ == '__main__':																			#test the function
-	func = response('/var/lib/asterisk/sounds/sip_response/workflow/text/request_977564821', 0, 0, '/var/lib/asterisk/sounds/sip_response', 1)
+	func = response('/var/lib/asterisk/sounds/sip_response/workflow/text/request_998032263', 0, 0, '/var/lib/asterisk/sounds/sip_response', 1)
 	print(func)
