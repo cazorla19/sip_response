@@ -67,7 +67,7 @@ def merge_files(merge_list, out_file, directory):				#merge some audio files int
 	return out_file
 
 def text_to_speech(text, language, out_file):
-	from gtts import gTTS
-	tts = gTTS(text=text, lang=language)
-	tts.save(out_file)
+	from gtts import gTTS 								#import google Text-to-speech
+	tts = gTTS(text=text, lang=language)				#set the text and language
+	tts.save(out_file)									#save result to file
 	return out_file

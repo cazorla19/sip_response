@@ -134,14 +134,11 @@ if status == 'auth':																						#verify user identity
 	agi.set_variable('auth_result', auth_result)															#tell dialplan what's the final result
 	agi.verbose('auth_result: %s' % auth_result)	
 if status == 'answer':
-	user_request_id = int(agi.get_variable('user_request_id'))
+	user_request_id = int(agi.get_variable('user_request_id'))												#2 items to generate answer: request id and call id
 	customer_id = int(agi.get_variable('customer_id'))
 	agi.verbose('user_request_id: %s' % user_request_id)
 	agi.verbose('customer_id: %s' % customer_id)
-	agi.verbose('call_id: %s' % request_file_key)
-	agi.verbose('request_dir: %s' % request_dir)
-	answer_file, answer_status = control.answer(user_request_id, customer_id, request_file_key, request_dir)
+	answer_file, answer_status = control.answer(user_request_id, customer_id, request_file_key, request_dir)	#send arguments to the function
 	agi.verbose('answer_status: %s' % answer_status)
-	audio_response = recognition.converter(answer_file, 'wav', 'gsm')		#convert response to GSM format for Asterisk playback
-	agi.verbose('audio_response: %s' % audio_response)
+	audio_response = recognition.converter(answer_file, 'wav', 'gsm')										#convert response to GSM format for Asterisk playback
 	agi.set_variable('answer', answer_status)
