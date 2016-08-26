@@ -148,6 +148,7 @@ if status == 'log':
 	customer_id = int(agi.get_variable('customer_id'))
 	answer_file = agi.get_variable('answer_file')
 	call_status = agi.get_variable('answer_status')
-	agi_call_id = request_file_key.split('_')[1]
+	agi_call_id = int(request_file_key.split('_')[1])
+	agi.verbose('arguments: %d %s %d %d %s %s' % (agi_call_id, callerId, customer_id, user_request_id, call_status, answer_file))
 	logging = control.record_log(agi_call_id, callerId, customer_id, user_request_id, call_status, answer_file)
 	agi.verbose('logging succeeded')
