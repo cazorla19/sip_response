@@ -11,9 +11,13 @@ def connect(host='127.0.0.1', port=5432, db='postgres', user='postgres', passwor
 	conn_string = "host='%s' port='%s' dbname='%s' user='%s' password='%s'" % (host, port, db, user, password)  #generate connection string
 	conn = psycopg2.connect(conn_string)                        #connect to database
 	cursor = conn.cursor()										#set cursor for statements execution
-	return cursor
+	return conn, cursor
 
-def query(statement, cursor):
+def query(statement, connect, cursor, flag=None):
 	cursor.execute(statement)
-	result = cursor.fetchall()									#get statement string
-	return result
+	if flag != 'insert':
+		result = cursor.fetchall()									#get statement string
+		return result
+	else:
+		connect.commit()
+		return 'INSERT succeeded!'

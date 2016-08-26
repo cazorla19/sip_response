@@ -142,3 +142,13 @@ if status == 'answer':
 	agi.verbose('answer_status: %s' % answer_status)
 	audio_response = recognition.converter(answer_file, 'wav', 'gsm')										#convert response to GSM format for Asterisk playback
 	agi.set_variable('answer', answer_status)
+	agi.set_variable('answer_file', audio_response)
+if status == 'log':
+	user_request_id = int(agi.get_variable('user_request_id'))
+	customer_id = int(agi.get_variable('customer_id'))
+	answer_file = agi.get_variable('answer_file')
+	call_status = agi.get_variable('answer_status')
+	if not call_status:		call_status = 'failed'
+	agi_call_id = request_file_key.split('_')[1]
+	logging = control.record_log(agi_call_id, callerId, customer_id, user_request_id, call_status, answer_file)
+	agi.verbose('logging succeeded')

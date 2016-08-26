@@ -26,7 +26,7 @@ def response(text_file, keyword_flag, request_flag, directory, keyword_scan):	#f
 	request = request.decode('utf-8').lower()
 	request_id = text_file.split('/')[-1]
 	shelve_file = directory + '/workflow/shelves/' + request_id
-	cursor = db_interface.connect(db='sip_response', user='cazorla19', password='123456')
+	connect, cursor = db_interface.connect(db='sip_response', user='cazorla19', password='123456')
 	if keyword_scan:
 		keyword_file = shelve.open(shelve_file)
 		statement = 'SELECT phrase FROM keywords'
@@ -65,7 +65,7 @@ def auth_name(text_file):
 	for line in open(text_file, 'r'):														#get request text
 		request = line
 	surname, name, middle_name, year = request.split()[0:4]									#syntax requires correct names and years order
-	cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
+	connect, cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
 	#get the fact customer exists, pull his id
 	statement = 'SELECT id, CONCAT(surname, \' \', name, \' \', middle_name, \' \', year) FROM customers WHERE surname = \'%s\' AND name = \'%s\' AND middle_name = \'%s\' AND year = \'%s\';' % (surname, name, middle_name, year)
 	result = db_interface.query(statement, cursor)
@@ -83,7 +83,7 @@ def auth_name(text_file):
 def auth_credentials(field, text_file, customer_id):
 	for line in open(text_file, 'r'):	#get request text
 		request = line
-	cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
+	connect, cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
 	statement = 'SELECT %s FROM auth WHERE customer_id = %d;' %(field, customer_id)			#field is a DB table column, customer id is a primary key
 	result = db_interface.query(statement, cursor)
 	credential = result[0][0]																#get first value as a customer credential
@@ -104,11 +104,12 @@ def answer(user_request_id, customer_id, call_id, directory):
 		final_statement_result = db_interface.query(final_statement, cursor)				#get all items by ID
 		return final_statement_result
 
-	cursor = db_interface.connect(db='sip_response', user='cazorla19', password='123456')
-	sql_statements_result = get_values(cursor, 'statement', 'statement', user_request_id)	#call the function
+
+	connect, cursor = db_interface.connect(db='sip_response', user='cazorla19', password='123456')
+	sql_statements_result = get_values(cursor, 'statement', 'statement', user_request_id)
 	answers_result = get_values(cursor, 'answer', 'sound_path', user_request_id)
 
-	customers_cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
+	connect, customers_cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
 	init_audio_format = 'mp3'
 	prepared_statements = []
 	for i in range(len(sql_statements_result)):												#convert the text statements result to answer
@@ -137,6 +138,11 @@ def answer(user_request_id, customer_id, call_id, directory):
 		status = 'failed'
 		return None, status
 
+def record_log(call_agi_id, call_number, customer_id, request_id, call_status, answer_file):
+	connect, cursor = db_interface.connect(db='sip_response', user='cazorla19', password='123456')
+	log_statement = 'INSERT INTO call_history(call_agi_id, call_timestamp, call_number, customer_id, request_id, call_status, answer_path) VALUES(%d, now(), \'%s\', %d, %d, \'%s\', \'%s\')' % (call_agi_id, call_number, customer_id, request_id, call_status, answer_file)
+	logging = db_interface.query(log_statement, connect, cursor, flag='insert')
+	print(logging)
 
 if __name__ == '__main__':																			#test the function
 	func = response('/var/lib/asterisk/sounds/sip_response/workflow/text/request_977564821', 0, 0, '/var/lib/asterisk/sounds/sip_response', 1)
