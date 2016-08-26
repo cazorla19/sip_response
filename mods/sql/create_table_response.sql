@@ -6,7 +6,7 @@ CREATE TABLE call_history (
 	call_status VARCHAR(10),
 	request_id INT,
 	customer_id INT,
-	answer_path VARCHAR(50),
+	answer_path VARCHAR(100),
 );
 
 CREATE TABLE requests (
