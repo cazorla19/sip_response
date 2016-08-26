@@ -142,3 +142,5 @@ if status == 'answer':
 	agi.verbose('answer_status: %s' % answer_status)
 	audio_response = recognition.converter(answer_file, 'wav', 'gsm')										#convert response to GSM format for Asterisk playback
 	agi.set_variable('answer', answer_status)
+if status == 'log':
+	
