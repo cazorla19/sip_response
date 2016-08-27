@@ -49,7 +49,7 @@ if status == 'request':
 		for root, dirs, files in os.walk(full_path, topdown=False):
 		    for name in files:
 		    	full_name = os.path.join(root, name)
-		    	if full_name != request_file:
+		    	if full_name != request_file:			#if full name is not request
 		        	os.remove(full_name)
 
 	if keyword_flag > 0 or request_flag > 0:																
