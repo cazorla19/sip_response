@@ -16,20 +16,16 @@ from asterisk.agi import *
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-config = ConfigParser.ConfigParser()
-config.read("myresponse.conf")
-native_db_host = config.get('native_database', 'db_host')
-native_db_port = config.get('native_database', 'db_port')
-native_db_name = config.get('native_database', 'db_name')
-native_db_user = config.get('native_database', 'db_user')
-native_db_password = config.get('native_database', 'db_password')
-customer_db_host = config.get('customer_database', 'db_host')
-customer_db_port = config.get('customer_database', 'db_port')
-customer_db_name = config.get('customer_database', 'db_name')
-customer_db_user = config.get('customer_database', 'db_user')
-customer_db_password = config.get('customer_database', 'db_password')
-
 def response(text_file, keyword_flag, request_flag, directory, keyword_scan):	#function to response initial user request
+	
+	config = ConfigParser.ConfigParser()
+	config.read("myresponse.conf")
+	native_db_host = config.get('native_database', 'db_host')
+	native_db_port = config.get('native_database', 'db_port')
+	native_db_name = config.get('native_database', 'db_name')
+	native_db_user = config.get('native_database', 'db_user')
+	native_db_password = config.get('native_database', 'db_password')
+
 	for line in open(text_file, 'r'):	#get request text
 		request = line
 	request = request.decode('utf-8').lower()
@@ -71,6 +67,15 @@ def response(text_file, keyword_flag, request_flag, directory, keyword_scan):	#f
 	return merged_file, req_len, key_len, user_request_id
 
 def auth_name(text_file):
+
+	config = ConfigParser.ConfigParser()
+	config.read("myresponse.conf")
+	customer_db_host = config.get('customer_database', 'db_host')
+	customer_db_port = config.get('customer_database', 'db_port')
+	customer_db_name = config.get('customer_database', 'db_name')
+	customer_db_user = config.get('customer_database', 'db_user')
+	customer_db_password = config.get('customer_database', 'db_password')
+
 	for line in open(text_file, 'r'):														#get request text
 		request = line
 	surname, name, middle_name, year = request.split()[0:4]									#syntax requires correct names and years order
@@ -90,6 +95,15 @@ def auth_name(text_file):
 		return status, customer_id
 
 def auth_credentials(field, text_file, customer_id):
+
+	config = ConfigParser.ConfigParser()
+	config.read("myresponse.conf")
+	customer_db_host = config.get('customer_database', 'db_host')
+	customer_db_port = config.get('customer_database', 'db_port')
+	customer_db_name = config.get('customer_database', 'db_name')
+	customer_db_user = config.get('customer_database', 'db_user')
+	customer_db_password = config.get('customer_database', 'db_password')
+
 	for line in open(text_file, 'r'):	#get request text
 		request = line
 	connect, cursor = db_interface.connect(host=customer_db_host, port=customer_db_port, db=customer_db_name, user=customer_db_user, password=customer_db_password)
@@ -101,6 +115,19 @@ def auth_credentials(field, text_file, customer_id):
 	return status
 
 def answer(user_request_id, customer_id, call_id, directory):
+
+	config = ConfigParser.ConfigParser()
+	config.read("myresponse.conf")
+	native_db_host = config.get('native_database', 'db_host')
+	native_db_port = config.get('native_database', 'db_port')
+	native_db_name = config.get('native_database', 'db_name')
+	native_db_user = config.get('native_database', 'db_user')
+	native_db_password = config.get('native_database', 'db_password')
+	customer_db_host = config.get('customer_database', 'db_host')
+	customer_db_port = config.get('customer_database', 'db_port')
+	customer_db_name = config.get('customer_database', 'db_name')
+	customer_db_user = config.get('customer_database', 'db_user')
+	customer_db_password = config.get('customer_database', 'db_password')
 
 	def get_values(cursor, table, column, user_request_id):									#template for list generation
 		statement = 'SELECT %s_id FROM requests_%ss WHERE request_id = %d ORDER BY seq_order;' %(table, table, user_request_id)	#get all items id with appropriate request
@@ -148,6 +175,15 @@ def answer(user_request_id, customer_id, call_id, directory):
 		return None, status
 
 def record_log(call_agi_id, call_number, customer_id, request_id, call_status, answer_file):
+
+	config = ConfigParser.ConfigParser()
+	config.read("myresponse.conf")
+	native_db_host = config.get('native_database', 'db_host')
+	native_db_port = config.get('native_database', 'db_port')
+	native_db_name = config.get('native_database', 'db_name')
+	native_db_user = config.get('native_database', 'db_user')
+	native_db_password = config.get('native_database', 'db_password')
+
 	connect, cursor = db_interface.connect(host=native_db_host, port=native_db_port, db=native_db_name, user=native_db_user, password=native_db_password)
 	#formatting INSERT query
 	log_statement = 'INSERT INTO call_history(call_agi_id, call_timestamp, call_number, customer_id, request_id, call_status, answer_path) VALUES(%d, now(), \'%s\', %d, %d, \'%s\', \'%s\')' % (call_agi_id, call_number, customer_id, request_id, call_status, answer_file)

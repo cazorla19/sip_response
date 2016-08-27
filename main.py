@@ -20,7 +20,6 @@ def check_extension(request_file, request_extension):	#check is it wav or not
 		request_file = recognition.converter(request_file, request_extension, 'wav')	#call converter if it's not wav
 	return request_file
 
-
 agi = AGI()							#initialize AGI instance
 agi.verbose("python agi started")		#print some stuff to ensure we connected
 callerId = agi.env['agi_callerid']
