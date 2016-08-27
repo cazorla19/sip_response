@@ -126,6 +126,7 @@ if status == 'guess':
 		agi.set_variable('reform_flag', 1)
 if status == 'auth':																						#verify user identity
 	field = agi.get_variable('auth_subrequest')																#get request field (name/cvv-code/credit card numbers/card code)
+	user_request_id = int(agi.get_variable('user_request_id'))
 	agi.verbose('auth_subrequest %s' % field)
 	request_subdir = 'workflow/auth'
 	request_file = request_dir + '/' + request_subdir + '/' + request_file_key + '.' + request_extension					#build full file name
@@ -133,7 +134,7 @@ if status == 'auth':																						#verify user identity
 	request_text_file = recognition.speech_to_text(request_file, request_dir, request_file_key, flag='auth')				#convert request to text
 	agi.verbose('request_text_file %s' % request_text_file)
 	if field == 'name':																						#call control module function depending on the subrequest
-		auth_result, customer_id = control.auth_name(request_text_file)
+		auth_result, customer_id = control.auth_name(request_text_file, user_request_id)
 		agi.set_variable('customer_id', customer_id)														#get customer id after name authentication
 		agi.verbose('customer_id: %s' % customer_id)
 	else:
