@@ -48,7 +48,7 @@ if status == 'request':
 		for root, dirs, files in os.walk(full_path, topdown=False):
 		    for name in files:
 		    	full_name = os.path.join(root, name)
-		    	if full_name != request_file:			#if full name is not request
+		    	if request_file_key not in full_name:			#if full name is not request
 		        	os.remove(full_name)
 
 	if keyword_flag > 0 or request_flag > 0:																
@@ -75,6 +75,8 @@ if status == 'request':
 	agi.verbose('request_list_len: %s' % request_list_len)
 	agi.verbose('keyword_list_len: %s' % keyword_list_len)
 	agi.verbose('user_request_id: %s' % user_request_id)
+	auth_status = control.check_auth_status(user_request_id)
+	agi.set_variable('auth_status', auth_status)
 	wav_file = audio_response
 	audio_response = recognition.converter(audio_response, 'wav', 'gsm')		#convert response to GSM format for Asterisk playback
 	agi.verbose('audio_response %s' % audio_response)
