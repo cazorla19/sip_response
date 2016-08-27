@@ -44,7 +44,7 @@ for directory in tmp_dirs:
 	for root, dirs, files in os.walk(full_path, topdown=False):
 	    for name in files:
 	        os.remove(os.path.join(root, name))
-	agi.verbose('directory cleaned up: %s' directory)
+	agi.verbose('directory cleaned up: %s' % directory)
 
 if status == 'request':
 	request_subdir = 'workflow/requests'
