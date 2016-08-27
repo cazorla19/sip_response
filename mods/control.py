@@ -70,16 +70,16 @@ def response(text_file, keyword_flag, request_flag, directory, keyword_scan):	#f
 	merged_file = recognition.merge_files(merge_list, out_file, directory)									#merge parts of response
 	return merged_file, req_len, key_len, user_request_id
 
-def check_auth_status(user_request_id):
+def check_auth_status(user_request_id):			#check authentication status of user request
 	connect, cursor = db_interface.connect(host=native_db_host, port=native_db_port, db=native_db_name, user=native_db_user, password=native_db_password)
-	status_statement = 'SELECT status FROM requests WHERE id = %d;' % (user_request_id)
+	status_statement = 'SELECT status FROM requests WHERE id = %d;' % (user_request_id)		#look at the database
 	result = db_interface.query(status_statement, connect, cursor)
 	request_status = result[0][0]
-	if request_status == 'noauth': return 'noauth'
+	if request_status == 'noauth': return 'noauth'											#return authentication status
 	else:	return 'auth'
 
 def auth_name(text_file, user_request_id):
-	auth_status = check_auth_status(user_request_id)
+	auth_status = check_auth_status(user_request_id)										#return successful auth status if there should be no authentication
 	if auth_status == 'noauth':	return 'success', 0
 	for line in open(text_file, 'r'):														#get request text
 		request = line
@@ -100,7 +100,7 @@ def auth_name(text_file, user_request_id):
 		return status, customer_id
 
 def auth_credentials(field, text_file, customer_id):
-	auth_status = check_auth_status(user_request_id)
+	auth_status = check_auth_status(user_request_id)										#return successful auth status if there should be no authentication
 	if auth_status == 'noauth':	return 'success'
 	for line in open(text_file, 'r'):	#get request text
 		request = line
