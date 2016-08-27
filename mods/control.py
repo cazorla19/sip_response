@@ -16,6 +16,18 @@ from asterisk.agi import *
 reload(sys)
 sys.setdefaultencoding('utf8')
 
+config.read("/var/lib/asterisk/agi-bin/sip_response/myresponse.conf")
+native_db_host = config.get('native_database', 'db_host')
+native_db_port = config.get('native_database', 'db_port')
+native_db_name = config.get('native_database', 'db_name')
+native_db_user = config.get('native_database', 'db_user')
+native_db_password = config.get('native_database', 'db_password')
+customer_db_host = config.get('customer_database', 'db_host')
+customer_db_port = config.get('customer_database', 'db_port')
+customer_db_name = config.get('customer_database', 'db_name')
+customer_db_user = config.get('customer_database', 'db_user')
+customer_db_password = config.get('customer_database', 'db_password')
+
 def response(text_file, keyword_flag, request_flag, directory, keyword_scan):	#function to response initial user request
 	
 	config = ConfigParser.ConfigParser()

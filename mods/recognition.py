@@ -30,7 +30,7 @@ def speech_to_text(myfile, directory, key, flag=None):
 	r.pause_threshold = 2					#set appropriate pause threshold
 
 	config = ConfigParser.ConfigParser()
-	config.read("myresponse.conf")
+	config.read("/var/lib/asterisk/agi-bin/sip_response/myresponse.conf")
 	google_key = config.get('recognition', 'google_api_key')
 	wit_key = config.get('recognition', 'wit_api_key')
 
