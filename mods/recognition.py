@@ -31,17 +31,10 @@ def speech_to_text(myfile, directory, key, flag=None):
 	with sr.AudioFile(myfile) as source:
 		audio = r.listen(source)			#create audio BLOB to recognize
 
-	engines = ['google', 'wit.ai', 'microsoft', 'api.ai']		#set list of supported engines
-	for engine in engines:
-		try:		#Google in priority but they have 50 API calls limit
-			if engine == 'google':			text = r.recognize_google(audio, key='AIzaSyD__ovqKNa7PSf0Xabf0CPtBbbWeckD_EI', language='ru-RU')
-			elif engine == 'wit.ai':		text = r.recognize_wit(audio, key='EZWIEEGQQT5CELKOZS7HT3L6LEY6NJXK')
-			elif engine == 'microsoft':		text = r.recognize_bing(audio, key='338eb14c85b54534b8e66bd51ecc0ef8', language='ru-RU')
-			elif engine == 'api.ai':		text = r.recognize_api(audio, client_access_token = 'd56167192e114d2f99389ecaa97c4164', language='ru')
-			if text:											#close the loop if we've got a text
-				break
-		except sr.UnknownValueError, sr.RequestError:			#if any engine was broken - go to the next
-			continue
+	try:																
+		text = r.recognize_google(audio, key='AIzaSyD__ovqKNa7PSf0Xabf0CPtBbbWeckD_EI', language='ru-RU') #Google in priority but they have 50 API calls limit
+	except sr.UnknownValueError, sr.RequestError:														#if Google was broken - go to the next
+		text = r.recognize_wit(audio, key='EZWIEEGQQT5CELKOZS7HT3L6LEY6NJXK')
 
 	text_file = directory + '/workflow/text/' + key 			#generate text file name
 	if flag:		text_file = text_file + '_' + flag			#if it`s guess - assign special suffix to skip original request overwrite
@@ -71,3 +64,8 @@ def text_to_speech(text, language, out_file):
 	tts = gTTS(text=text, lang=language)				#set the text and language
 	tts.save(out_file)									#save result to file
 	return out_file
+
+if __name__ == '__main__':																			#test the function
+	func = speech_to_text('/var/lib/asterisk/sounds/sip_response/workflow/requests/request_1365506225.wav', '/var/lib/asterisk/sounds/sip_response', 'request_1365506225')
+	for line in open(func, 'r'):
+		print(line)
