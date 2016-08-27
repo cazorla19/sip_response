@@ -23,18 +23,24 @@ def converter(con_file, in_extension, out_extension):
 
 def speech_to_text(myfile, directory, key, flag=None):
 	import speech_recognition as sr
+	import ConfigParser
 
 	r = sr.Recognizer()						#create new object
 	r.energy_threshold = 300				#set energy threshold
 	r.pause_threshold = 2					#set appropriate pause threshold
 
+	config = ConfigParser.ConfigParser()
+	config.read("myresponse.conf")
+	google_key = config.get('recognition', 'google_api_key')
+	wit_key = config.get('recognition', 'wit_api_key')
+
 	with sr.AudioFile(myfile) as source:
 		audio = r.listen(source)			#create audio BLOB to recognize
 
 	try:																
-		text = r.recognize_google(audio, key='AIzaSyD__ovqKNa7PSf0Xabf0CPtBbbWeckD_EI', language='ru-RU') #Google in priority but they have 50 API calls limit
+		text = r.recognize_google(audio, key=google_key, language='ru-RU') #Google in priority but they have 50 API calls limit
 	except sr.UnknownValueError, sr.RequestError:														#if Google was broken - go to the next
-		text = r.recognize_wit(audio, key='EZWIEEGQQT5CELKOZS7HT3L6LEY6NJXK')
+		text = r.recognize_wit(audio, key=wit_key)
 
 	text_file = directory + '/workflow/text/' + key 			#generate text file name
 	if flag:		text_file = text_file + '_' + flag			#if it`s guess - assign special suffix to skip original request overwrite

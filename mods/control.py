@@ -10,15 +10,24 @@ import recognition
 import sys
 import shelve
 import os
+import ConfigParser
 from asterisk.agi import *
-
-"""
-TO DO!
-Set length of requests results and pass to AGI
-"""
 
 reload(sys)
 sys.setdefaultencoding('utf8')
+
+config = ConfigParser.ConfigParser()
+config.read("myresponse.conf")
+native_db_host = config.get('native_database', 'db_host')
+native_db_port = config.get('native_database', 'db_port')
+native_db_name = config.get('native_database', 'db_name')
+native_db_user = config.get('native_database', 'db_user')
+native_db_password = config.get('native_database', 'db_password')
+customer_db_host = config.get('customer_database', 'db_host')
+customer_db_port = config.get('customer_database', 'db_port')
+customer_db_name = config.get('customer_database', 'db_name')
+customer_db_user = config.get('customer_database', 'db_user')
+customer_db_password = config.get('customer_database', 'db_password')
 
 def response(text_file, keyword_flag, request_flag, directory, keyword_scan):	#function to response initial user request
 	for line in open(text_file, 'r'):	#get request text
@@ -26,7 +35,7 @@ def response(text_file, keyword_flag, request_flag, directory, keyword_scan):	#f
 	request = request.decode('utf-8').lower()
 	request_id = text_file.split('/')[-1]
 	shelve_file = directory + '/workflow/shelves/' + request_id
-	connect, cursor = db_interface.connect(db='sip_response', user='cazorla19', password='123456')
+	connect, cursor = db_interface.connect(host=native_db_host, port=native_db_port, db=native_db_name, user=native_db_user, password=native_db_password)
 	if keyword_scan:
 		keyword_file = shelve.open(shelve_file)
 		statement = 'SELECT phrase FROM keywords'
@@ -65,7 +74,7 @@ def auth_name(text_file):
 	for line in open(text_file, 'r'):														#get request text
 		request = line
 	surname, name, middle_name, year = request.split()[0:4]									#syntax requires correct names and years order
-	connect, cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
+	connect, cursor = db_interface.connect(host=customer_db_host, port=customer_db_port, db=customer_db_name, user=customer_db_user, password=customer_db_password)
 	#get the fact customer exists, pull his id
 	statement = 'SELECT id, CONCAT(surname, \' \', name, \' \', middle_name, \' \', year) FROM customers WHERE surname = \'%s\' AND name = \'%s\' AND middle_name = \'%s\' AND year = \'%s\';' % (surname, name, middle_name, year)
 	result = db_interface.query(statement, connect, cursor)
@@ -83,7 +92,7 @@ def auth_name(text_file):
 def auth_credentials(field, text_file, customer_id):
 	for line in open(text_file, 'r'):	#get request text
 		request = line
-	connect, cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
+	connect, cursor = db_interface.connect(host=customer_db_host, port=customer_db_port, db=customer_db_name, user=customer_db_user, password=customer_db_password)
 	statement = 'SELECT %s FROM auth WHERE customer_id = %d;' %(field, customer_id)			#field is a DB table column, customer id is a primary key
 	result = db_interface.query(statement, connect, cursor)
 	credential = result[0][0]																#get first value as a customer credential
@@ -105,11 +114,11 @@ def answer(user_request_id, customer_id, call_id, directory):
 		return final_statement_result
 
 
-	connect, cursor = db_interface.connect(db='sip_response', user='cazorla19', password='123456')
+	connect, cursor = db_interface.connect(host=native_db_host, port=native_db_port, db=native_db_name, user=native_db_user, password=native_db_password)
 	sql_statements_result = get_values(cursor, 'statement', 'statement', user_request_id)
 	answers_result = get_values(cursor, 'answer', 'sound_path', user_request_id)
 
-	connect, customers_cursor = db_interface.connect(db='customers', user='cazorla19', password='123456')
+	connect, customers_cursor = db_interface.connect(host=customer_db_host, port=customer_db_port, db=customer_db_name, user=customer_db_user, password=customer_db_password)
 	init_audio_format = 'mp3'
 	prepared_statements = []
 	for i in range(len(sql_statements_result)):												#convert the text statements result to answer
@@ -139,11 +148,11 @@ def answer(user_request_id, customer_id, call_id, directory):
 		return None, status
 
 def record_log(call_agi_id, call_number, customer_id, request_id, call_status, answer_file):
-	connect, cursor = db_interface.connect(db='sip_response', user='cazorla19', password='123456')
+	connect, cursor = db_interface.connect(host=native_db_host, port=native_db_port, db=native_db_name, user=native_db_user, password=native_db_password)
 	#formatting INSERT query
 	log_statement = 'INSERT INTO call_history(call_agi_id, call_timestamp, call_number, customer_id, request_id, call_status, answer_path) VALUES(%d, now(), \'%s\', %d, %d, \'%s\', \'%s\')' % (call_agi_id, call_number, customer_id, request_id, call_status, answer_file)
 	logging = db_interface.query(log_statement, connect, cursor, flag='insert')
 
 if __name__ == '__main__':																			#test the function
-	func = response('/var/lib/asterisk/sounds/sip_response/workflow/text/request_998032263', 0, 0, '/var/lib/asterisk/sounds/sip_response', 1)
+	func = response('/var/lib/asterisk/sounds/sip_response/workflow/text/request_1365506225', 0, 0, '/var/lib/asterisk/sounds/sip_response', 1)
 	print(func)
