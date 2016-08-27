@@ -1,9 +1,12 @@
 CREATE TABLE call_history (
 	call_id SERIAL PRIMARY KEY,
+	call_agi_id BIGINT NOT NULL,
 	call_timestamp TIMESTAMP NOT NULL,
-	call_number INT,
+	call_number VARCHAR(50),
 	call_status VARCHAR(10),
-	call_mark INT DEFAULT 0
+	request_id INT,
+	customer_id INT,
+	answer_path VARCHAR(100),
 );
 
 CREATE TABLE requests (

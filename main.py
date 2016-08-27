@@ -141,6 +141,14 @@ if status == 'answer':
 	answer_file, answer_status = control.answer(user_request_id, customer_id, request_file_key, request_dir)	#send arguments to the function
 	agi.verbose('answer_status: %s' % answer_status)
 	audio_response = recognition.converter(answer_file, 'wav', 'gsm')										#convert response to GSM format for Asterisk playback
-	agi.set_variable('answer', answer_status)
-if status == 'log':
-	
+	agi.set_variable('call_status', answer_status)
+	agi.set_variable('answer_file', audio_response)
+if status == 'log':																							#logging each call
+	user_request_id = int(agi.get_variable('user_request_id'))												#get all parameters we need
+	customer_id = int(agi.get_variable('customer_id'))
+	answer_file = agi.get_variable('answer_file')
+	call_status = agi.get_variable('call_status')
+	agi_call_id = int(request_file_key.split('_')[1])
+	agi.verbose('arguments: %d %s %d %d %s %s' % (agi_call_id, callerId, customer_id, user_request_id, call_status, answer_file))
+	logging = control.record_log(agi_call_id, callerId, customer_id, user_request_id, call_status, answer_file)	#call control module to record logs
+	agi.verbose('logging succeeded')
