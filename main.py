@@ -20,6 +20,16 @@ def check_extension(request_file, request_extension):	#check is it wav or not
 		request_file = recognition.converter(request_file, request_extension, 'wav')	#call converter if it's not wav
 	return request_file
 
+request_dir = '/var/lib/asterisk/sounds/sip_response'
+
+#filesystem cleanup
+tmp_dirs = ['answers_tmp', 'auth', 'guesses', 'requests', 'responses', 'shelves', 'statements', 'text']
+for directory in tmp_dirs:
+	full_path = request_dir + '/' + directory
+	for root, dirs, files in os.walk(full_path, topdown=False):
+	    for name in files:
+	        os.remove(os.path.join(root, name))
+
 agi = AGI()							#initialize AGI instance
 agi.verbose("python agi started")		#print some stuff to ensure we connected
 callerId = agi.env['agi_callerid']
@@ -34,7 +44,6 @@ request_extension = agi.get_variable('file_extension')						#get file extension
 agi.verbose(status)
 agi.verbose('request_flag: %s' % request_flag)
 agi.verbose('keyword_flag: %s' % keyword_flag)
-request_dir = '/var/lib/asterisk/sounds/sip_response'
 if status == 'request':
 	request_subdir = 'workflow/requests'
 	request_file = request_dir + '/' + request_subdir + '/' + request_file_key + '.' + request_extension	#build full file name
