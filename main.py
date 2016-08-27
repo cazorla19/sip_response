@@ -37,20 +37,21 @@ agi.verbose('request_flag: %s' % request_flag)
 agi.verbose('keyword_flag: %s' % keyword_flag)
 request_dir = '/var/lib/asterisk/sounds/sip_response'
 
-#filesystem cleanup
-if status == 'request':
-	tmp_dirs = ['answers_tmp', 'auth', 'guesses', 'requests', 'responses', 'shelves', 'statements', 'text']
-	for directory in tmp_dirs:
-		full_path = request_dir + '/workflow/' + directory
-		for root, dirs, files in os.walk(full_path, topdown=False):
-		    for name in files:
-		        os.remove(os.path.join(root, name))
-		agi.verbose('directory cleaned up: %s' % directory)
-
 if status == 'request':
 	request_subdir = 'workflow/requests'
 	request_file = request_dir + '/' + request_subdir + '/' + request_file_key + '.' + request_extension	#build full file name
 	request_file = check_extension(request_file, request_extension)
+
+	#filesystem cleanup
+	tmp_dirs = ['answers_tmp', 'auth', 'guesses', 'responses', 'shelves', 'statements', 'text']
+	for directory in tmp_dirs:
+		full_path = request_dir + '/workflow/' + directory
+		for root, dirs, files in os.walk(full_path, topdown=False):
+		    for name in files:
+		    	full_name = os.path.join(root, name)
+		    	if full_name != request_file:
+		        	os.remove(full_name)
+
 	if keyword_flag > 0 or request_flag > 0:																
 		#if it's not first iteration - get the processed text file
 		#cause we don't need to recognize the same request we did before
