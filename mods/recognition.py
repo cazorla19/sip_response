@@ -34,7 +34,7 @@ def speech_to_text(myfile, directory, key, flag=None):
 	engines = ['google', 'wit.ai', 'microsoft', 'api.ai']		#set list of supported engines
 	for engine in engines:
 		try:		#Google in priority but they have 50 API calls limit
-			if engine == 'google':			text = r.recognize_google(audio, key='AIzaSyD__ovqKNa7PSf0Xabf0CPtBbbWeckD_EI', language='ru-RU')
+			if engine == 'google':			raise sr.UnknownValueError
 			elif engine == 'wit.ai':		text = r.recognize_wit(audio, key='EZWIEEGQQT5CELKOZS7HT3L6LEY6NJXK')
 			elif engine == 'microsoft':		text = r.recognize_bing(audio, key='338eb14c85b54534b8e66bd51ecc0ef8', language='ru-RU')
 			elif engine == 'api.ai':		text = r.recognize_api(audio, client_access_token = 'd56167192e114d2f99389ecaa97c4164', language='ru')
