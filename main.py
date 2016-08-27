@@ -41,9 +41,11 @@ request_dir = '/var/lib/asterisk/sounds/sip_response'
 if status == 'request':
 	tmp_dirs = ['answers_tmp', 'auth', 'guesses', 'requests', 'responses', 'shelves', 'statements', 'text']
 	for directory in tmp_dirs:
-		full_path = request_dir + '/' + directory
-		for name in os.listdir(full_path):
-			os.remove(os.path.join(full_path, name))
+		full_path = request_dir + '/workflow/' + directory
+		for root, dirs, files in os.walk(full_path, topdown=False):
+		    for name in files:
+		        os.remove(os.path.join(root, name))
+		agi.verbose('directory cleaned up: %s' % directory)
 
 if status == 'request':
 	request_subdir = 'workflow/requests'
