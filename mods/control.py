@@ -16,7 +16,7 @@ from asterisk.agi import *
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-config = ConfigParser.ConfigParser()
+config = ConfigParser.ConfigParser()									#getting credentials from log file
 config.read("/var/lib/asterisk/agi-bin/sip_response/myresponse.conf")
 native_db_host = config.get('native_database', 'db_host')
 native_db_port = config.get('native_database', 'db_port')

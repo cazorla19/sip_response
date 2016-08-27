@@ -29,7 +29,7 @@ def speech_to_text(myfile, directory, key, flag=None):
 	r.energy_threshold = 300				#set energy threshold
 	r.pause_threshold = 2					#set appropriate pause threshold
 
-	config = ConfigParser.ConfigParser()
+	config = ConfigParser.ConfigParser()										#getting credentials from log file
 	config.read("/var/lib/asterisk/agi-bin/sip_response/myresponse.conf")
 	google_key = config.get('recognition', 'google_api_key')
 	wit_key = config.get('recognition', 'wit_api_key')
