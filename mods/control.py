@@ -140,9 +140,9 @@ def answer(user_request_id, customer_id, call_id, directory):
 
 def record_log(call_agi_id, call_number, customer_id, request_id, call_status, answer_file):
 	connect, cursor = db_interface.connect(db='sip_response', user='cazorla19', password='123456')
+	#formatting INSERT query
 	log_statement = 'INSERT INTO call_history(call_agi_id, call_timestamp, call_number, customer_id, request_id, call_status, answer_path) VALUES(%d, now(), \'%s\', %d, %d, \'%s\', \'%s\')' % (call_agi_id, call_number, customer_id, request_id, call_status, answer_file)
 	logging = db_interface.query(log_statement, connect, cursor, flag='insert')
-	print(logging)
 
 if __name__ == '__main__':																			#test the function
 	func = response('/var/lib/asterisk/sounds/sip_response/workflow/text/request_998032263', 0, 0, '/var/lib/asterisk/sounds/sip_response', 1)

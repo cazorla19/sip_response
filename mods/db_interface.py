@@ -19,5 +19,5 @@ def query(statement, connect, cursor, flag=None):
 		result = cursor.fetchall()									#get statement string
 		return result
 	else:
-		connect.commit()
+		connect.commit()											#INSERT statement needs commit
 		return 'INSERT succeeded!'
