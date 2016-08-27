@@ -36,7 +36,7 @@ def speech_to_text(myfile, directory, key, flag=None):
 		try:		#Google in priority but they have 50 API calls limit
 			if engine == 'google':			raise sr.UnknownValueError
 			elif engine == 'wit.ai':		raise sr.UnknownValueError
-			elif engine == 'microsoft':		text = r.recognize_bing(audio, key='338eb14c85b54534b8e66bd51ecc0ef8', language='ru-RU')
+			elif engine == 'microsoft':		raise sr.UnknownValueError
 			elif engine == 'api.ai':		text = r.recognize_api(audio, client_access_token = 'd56167192e114d2f99389ecaa97c4164', language='ru')
 			if text:											#close the loop if we've got a text
 				break
