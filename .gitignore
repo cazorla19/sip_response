@@ -5,3 +5,4 @@ pip-selfcheck.json
 include
 *.pyc
 *__pycache__
+*.conf
