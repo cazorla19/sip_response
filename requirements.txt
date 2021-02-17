@@ -3,7 +3,7 @@ gTTS-token==1.1.1
 psycopg2==2.6.2
 pydub==0.16.5
 pyst2==0.4.9
-PyYAML==3.11
+PyYAML==5.1
 requests==2.11.0
 six==1.10.0
 SpeechRecognition==3.4.6
